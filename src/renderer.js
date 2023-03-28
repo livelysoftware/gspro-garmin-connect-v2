@@ -6,12 +6,24 @@ window.addEventListener('DOMContentLoaded', () => {
     let ipOptionsOpen = false
 
     window.onmessage = (event) => {
+        console.log(event)
         if (event.source === window && event.data === 'main-port') {
             const [_port] = event.ports
             port = _port
             _port.onmessage = (event) => {
                 handleMessage(event.data)
             }
+
+            const ballModifierPercentage = document.querySelector(
+                '#ballModifierPercentage'
+            );
+
+            ballModifierPercentage.addEventListener('keyup', (e) => {
+                port.postMessage({
+                    type: 'ballModifierPercentage',
+                    data: e.target.value,
+                });
+            });
 
             const sendTestShotButton = document.querySelector('#send-test-shot')
 

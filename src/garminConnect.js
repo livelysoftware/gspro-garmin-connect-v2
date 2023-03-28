@@ -17,12 +17,15 @@ class GarminConnect {
         this.localIP = localIP;
         this.pingTimeout = false;
         this.intervalID = null; //heatbeat ID
+        this.ballModifierPercentage = 0;
 
         ipcPort.on('message', (event) => {
             if (event.data === 'sendTestShot') {
                 this.sendTestShot();
             } else if (event.data && event.data.type === 'setIP') {
                 this.setNewIP(event.data.data);
+            } else if (event.data && event.data.type === 'ballModifierPercentage') {
+                this.setBallModifierPercentage(event.data.data);
             }
         });
 
@@ -38,6 +41,10 @@ class GarminConnect {
         ipcPort.start();
 
         this.listen();
+    }
+
+    setBallModifierPercentage(percentage) {
+        this.ballModifierPercentage = percentage;
     }
 
     setNewIP(ip) {
@@ -302,7 +309,7 @@ class GarminConnect {
             type: 'gsProShotStatus',
             ready: false,
         });
-        this.gsProConnect.launchBall(this.ballData, this.clubData);
+        this.gsProConnect.launchBall(this.ballData, this.clubData, this.ballModifierPercentage);
 
         if (this.client) {
             this.client.write(SimMessages.get_success_message('SendShot'));
